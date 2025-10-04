@@ -1,0 +1,27 @@
+🚀 ONE-COMMAND DEPLOY
+=====================
+
+Extract the app, then run this:
+
+cd nuit-blanche-app && npm install && npx vercel
+
+
+That's it! Your Nuit Blanche navigator will be live in 60 seconds.
+
+📱 Open the URL on your phone → Add to home screen → Ready for tonight!
+
+
+✨ What you'll get:
+-------------------
+→ Live URL like: https://nuit-blanche-navigator.vercel.app
+→ Auto-updates your location
+→ Shows 91 events sorted by distance
+→ One-tap navigation to each event
+→ Event details and artist info
+→ Works on any phone
+
+
+🎯 Ready for Nuit Blanche Toronto 2025
+   Oct 4-5, 7pm-7am
+
+Enjoy! 🌙

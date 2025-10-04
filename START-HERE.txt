@@ -1,0 +1,50 @@
+═══════════════════════════════════════════════════════
+   🎨 NUIT BLANCHE NAVIGATOR - START HERE! 🎨
+═══════════════════════════════════════════════════════
+
+Get your Nuit Blanche navigation app live in 3 steps:
+
+
+STEP 1: Extract
+───────────────
+   tar -xzf nuit-blanche-app.tar.gz
+   cd nuit-blanche-app
+
+
+STEP 2: Deploy  
+───────────────
+   npm install && npx vercel
+
+   (Login with GitHub when asked, then press Enter for all prompts)
+
+
+STEP 3: Use It!
+───────────────
+   ✅ Vercel gives you a URL
+   📱 Open URL on your phone  
+   🏠 Add to home screen
+   🎉 Navigate to 91 events tonight!
+
+
+═══════════════════════════════════════════════════════
+
+THAT'S IT! 🚀
+
+Your app shows:
+→ All 91 Nuit Blanche events
+→ Sorted by distance from you
+→ One-tap Google Maps directions
+→ Event details and artist info
+
+
+TONIGHT (Oct 4-5, 7pm-7am):
+1. Open your app
+2. Allow location
+3. See nearby events  
+4. Tap "Get Directions"
+5. Enjoy Nuit Blanche! 🌙✨
+
+
+Need help? Read QUICK-START.txt for more details.
+
+═══════════════════════════════════════════════════════

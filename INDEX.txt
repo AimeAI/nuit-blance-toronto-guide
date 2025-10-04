@@ -1,0 +1,86 @@
+🎨 NUIT BLANCHE NAVIGATOR - FILE INDEX
+═══════════════════════════════════════════════════════════════
+
+📁 YOUR FILES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 APPLICATION FILES (Choose One):
+
+   nuit-blanche-app.tar.gz (36KB)
+   → Complete React + Vite app
+   → Deploy to Vercel for best experience
+   → All features, professional UI
+   ★ RECOMMENDED ★
+
+   nuit-blanche-navigator.html (26KB)
+   → Single-file version
+   → Works immediately in browser
+   → Good for quick testing
+
+
+📖 GETTING STARTED (Read These First):
+
+   ⭐ START-HERE.txt
+   → Absolute simplest instructions
+   → Read this if you're in a hurry
+   
+   WHICH-FILE-TO-USE.txt
+   → Explains what each file does
+   → Helps you choose
+   
+   DEPLOY-NOW.txt
+   → One-command deployment
+   → Fastest path to live app
+
+
+📚 DETAILED GUIDES:
+
+   QUICK-START.txt
+   → Step-by-step instructions
+   → Tips and troubleshooting
+   → Command reference
+   
+   README.md
+   → Full technical documentation
+   → Feature list
+   → Customization options
+   
+   PROJECT-SUMMARY.txt
+   → Complete project overview
+   → Everything in one place
+   → Tonight's schedule
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 QUICKEST PATH TO SUCCESS:
+
+1. Read: START-HERE.txt (30 seconds)
+2. Extract: tar -xzf nuit-blanche-app.tar.gz
+3. Deploy: cd nuit-blanche-app && npm install && npx vercel
+4. Use: Open URL on phone, enjoy Nuit Blanche!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 WHAT YOU GET:
+
+✓ All 91 Nuit Blanche 2025 events
+✓ GPS coordinates for every installation
+✓ Auto-location detection
+✓ Distance sorting (closest first)
+✓ One-tap Google Maps navigation
+✓ Event details and artist info
+✓ Beautiful mobile-optimized UI
+✓ Works on iPhone and Android
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📅 TONIGHT: October 4-5, 2025 • 7pm-7am
+🎨 THEME: Translating the City
+📍 LOCATIONS: Toronto-wide (3 main hubs + 60+ independent)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ready? Open START-HERE.txt and let's go! 🚀
+
+Have an amazing Nuit Blanche! 🌙✨

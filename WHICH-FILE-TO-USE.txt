@@ -1,0 +1,89 @@
+📁 WHICH FILE SHOULD I USE?
+═══════════════════════════════════════════════════════════════
+
+You have multiple options. Here's what each file does:
+
+
+🚀 RECOMMENDED: Deploy the React App
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   FILE: nuit-blanche-app.tar.gz
+   
+   ✅ Best option - Full features
+   ✅ Most polished UI
+   ✅ Auto-location detection
+   ✅ Event details expand/collapse
+   ✅ Professional design
+   
+   HOW TO USE:
+   1. tar -xzf nuit-blanche-app.tar.gz
+   2. cd nuit-blanche-app
+   3. npm install && npx vercel
+   4. Open URL on phone
+   
+   TIME: 60 seconds
+
+
+⚡ QUICK TEST: Use the HTML File
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   FILE: nuit-blanche-navigator.html
+   
+   ✅ Works immediately
+   ✅ No deployment needed
+   ✅ Single file
+   ✅ Good for testing
+   ❌ Simpler UI than React version
+   
+   HOW TO USE:
+   1. Just open the file in a browser
+   2. Or upload to any web host
+   
+   TIME: 5 seconds
+
+
+📖 DOCUMENTATION FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   START-HERE.txt
+   → Absolute simplest instructions
+   → Read this first if confused
+   
+   DEPLOY-NOW.txt  
+   → One-command deployment
+   → Minimal explanation
+   
+   QUICK-START.txt
+   → Detailed step-by-step guide
+   → Tips and troubleshooting
+   
+   README.md
+   → Full technical documentation
+   → Feature list, customization
+   
+   PROJECT-SUMMARY.txt
+   → Complete project overview
+   → Everything in one place
+
+
+🎯 RECOMMENDATION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For tonight's Nuit Blanche, use the REACT APP:
+
+   tar -xzf nuit-blanche-app.tar.gz
+   cd nuit-blanche-app
+   npm install && npx vercel
+
+You'll get a professional app that:
+→ Shows your location
+→ Sorts events by distance
+→ Provides Google Maps navigation
+→ Has event details for all 91 installations
+
+
+═══════════════════════════════════════════════════════════════
+
+Questions? Read START-HERE.txt for the simplest guide!
+
+Have fun at Nuit Blanche! 🎨🌙

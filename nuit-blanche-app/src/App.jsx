@@ -1,6 +1,37 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
+// Hub definitions
+const HUBS = {
+  DOWNTOWN: { name: 'Downtown', color: '#667eea', emoji: '🏙️' },
+  NORTH_YORK: { name: 'North York', color: '#f093fb', emoji: '🌆' },
+  ETOBICOKE: { name: 'Etobicoke', color: '#4facfe', emoji: '🌊' },
+  INDEPENDENT: { name: 'Independent', color: '#43e97b', emoji: '✨' }
+};
+
+// Must-see "Hot Now" events
+const HOT_EVENTS = [
+  "100% [City]",
+  "Tower of Babel",
+  "People's Dancefloor",
+  "we see you",
+  "The Eye of Wisdom",
+  "Undersight",
+  "The Bentway - A Lake Story"
+];
+
+// Categorize event by location
+const getHub = (lat, lng) => {
+  // North York (north of Eglinton)
+  if (lat > 43.70) return HUBS.NORTH_YORK;
+  // Etobicoke (west of Humber)
+  if (lng < -79.50) return HUBS.ETOBICOKE;
+  // Downtown core
+  if (lat > 43.63 && lat < 43.70 && lng > -79.42 && lng < -79.36) return HUBS.DOWNTOWN;
+  // Independent
+  return HUBS.INDEPENDENT;
+};
+
 // All 91 Nuit Blanche events
 const events = [
   {name: "Theatre Passe Muraille - Nuit Blanche Rest Stop", artist: "Various", lat: 43.6534, lng: -79.4011, description: "A rest stop for contemplation and stillness"},
@@ -102,6 +133,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterHub, setFilterHub] = useState('all');
+  const [showHotOnly, setShowHotOnly] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   // Calculate distance between two coordinates
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -122,6 +157,13 @@ function App() {
 
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
+      // Show all events even without location
+      const eventsWithData = events.map(event => ({
+        ...event,
+        hub: getHub(event.lat, event.lng),
+        isHot: HOT_EVENTS.includes(event.name)
+      }));
+      setSortedEvents(eventsWithData);
       setLoading(false);
       return;
     }
@@ -133,19 +175,28 @@ function App() {
           lng: position.coords.longitude
         };
         setUserLocation(location);
-        
+
         // Calculate distances and sort
         const eventsWithDistance = events.map(event => ({
           ...event,
-          distance: calculateDistance(location.lat, location.lng, event.lat, event.lng)
+          distance: calculateDistance(location.lat, location.lng, event.lat, event.lng),
+          hub: getHub(event.lat, event.lng),
+          isHot: HOT_EVENTS.includes(event.name)
         }));
-        
+
         eventsWithDistance.sort((a, b) => a.distance - b.distance);
         setSortedEvents(eventsWithDistance);
         setLoading(false);
       },
       (error) => {
-        setError('Unable to get your location. Please enable location services.');
+        setError('Location disabled. Showing all events.');
+        // Show all events even without location
+        const eventsWithData = events.map(event => ({
+          ...event,
+          hub: getHub(event.lat, event.lng),
+          isHot: HOT_EVENTS.includes(event.name)
+        }));
+        setSortedEvents(eventsWithData);
         setLoading(false);
         console.error(error);
       }
@@ -162,6 +213,22 @@ function App() {
     window.open(url, '_blank');
   };
 
+  const openMapView = () => {
+    const markers = filteredEvents.map(e => `${e.lat},${e.lng}`).join('|');
+    const url = `https://www.google.com/maps/search/?api=1&query=${filteredEvents[0]?.lat},${filteredEvents[0]?.lng}`;
+    window.open(url, '_blank');
+  };
+
+  // Filter events based on search, hub, and hot status
+  const filteredEvents = sortedEvents.filter(event => {
+    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         event.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesHub = filterHub === 'all' || event.hub?.name === filterHub;
+    const matchesHot = !showHotOnly || event.isHot;
+    return matchesSearch && matchesHub && matchesHot;
+  });
+
   return (
     <div className="app">
       <header className="header">
@@ -170,8 +237,8 @@ function App() {
       </header>
 
       <div className="controls">
-        <button 
-          onClick={getUserLocation} 
+        <button
+          onClick={getUserLocation}
           disabled={loading}
           className="locate-btn"
         >
@@ -179,9 +246,48 @@ function App() {
         </button>
         {userLocation && (
           <div className="location-info">
-            ✓ Found {sortedEvents.length} events nearby
+            ✓ Found {filteredEvents.length} events nearby
           </div>
         )}
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="🔍 Search events, artists..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+
+        {/* Filters */}
+        <div className="filters">
+          <select
+            value={filterHub}
+            onChange={(e) => setFilterHub(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All Hubs</option>
+            <option value="Downtown">🏙️ Downtown</option>
+            <option value="North York">🌆 North York</option>
+            <option value="Etobicoke">🌊 Etobicoke</option>
+            <option value="Independent">✨ Independent</option>
+          </select>
+
+          <button
+            onClick={() => setShowHotOnly(!showHotOnly)}
+            className={`hot-filter ${showHotOnly ? 'active' : ''}`}
+          >
+            🔥 Hot Now
+          </button>
+
+          <button
+            onClick={openMapView}
+            className="map-btn"
+            disabled={filteredEvents.length === 0}
+          >
+            🗺️ Map
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -191,19 +297,27 @@ function App() {
       )}
 
       <div className="events-list">
-        {sortedEvents.map((event, index) => (
-          <div key={index} className="event-card">
+        {filteredEvents.map((event, index) => (
+          <div key={index} className={`event-card ${event.isHot ? 'hot-event' : ''}`} style={{ borderLeftColor: event.hub?.color }}>
+            {event.isHot && <div className="hot-badge">🔥 HOT NOW</div>}
             <div className="event-header">
-              <h3 className="event-name">{event.name}</h3>
-              <span className="event-distance">
-                {event.distance < 1 
-                  ? `${(event.distance * 1000).toFixed(0)}m` 
-                  : `${event.distance.toFixed(1)}km`}
-              </span>
+              <div className="event-title-row">
+                <h3 className="event-name">{event.name}</h3>
+                <span className="hub-badge" style={{ backgroundColor: event.hub?.color }}>
+                  {event.hub?.emoji} {event.hub?.name}
+                </span>
+              </div>
+              {event.distance && (
+                <span className="event-distance">
+                  {event.distance < 1
+                    ? `${(event.distance * 1000).toFixed(0)}m`
+                    : `${event.distance.toFixed(1)}km`}
+                </span>
+              )}
             </div>
-            
+
             <p className="event-artist">👤 {event.artist}</p>
-            
+
             {selectedEvent === index && (
               <div className="event-details">
                 <p className="event-description">{event.description}</p>
@@ -212,15 +326,15 @@ function App() {
                 </p>
               </div>
             )}
-            
+
             <div className="event-actions">
-              <button 
+              <button
                 onClick={() => openDirections(event)}
                 className="directions-btn"
               >
                 🗺️ Get Directions
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedEvent(selectedEvent === index ? null : index)}
                 className="details-btn"
               >
@@ -230,6 +344,12 @@ function App() {
           </div>
         ))}
       </div>
+
+      {filteredEvents.length === 0 && !loading && (
+        <div className="empty-state">
+          <p>No events found. Try adjusting your filters.</p>
+        </div>
+      )}
 
       {sortedEvents.length === 0 && !loading && !error && (
         <div className="empty-state">

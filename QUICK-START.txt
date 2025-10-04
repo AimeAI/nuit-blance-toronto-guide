@@ -1,0 +1,102 @@
+🎨 NUIT BLANCHE NAVIGATOR - QUICK START GUIDE
+==============================================
+
+Your Nuit Blanche navigation app is ready! Here's how to deploy it in 2 minutes:
+
+📦 WHAT YOU HAVE:
+-----------------
+- Complete React + Vite app
+- All 91 Nuit Blanche 2025 events with GPS coordinates
+- Auto-location detection
+- One-tap Google Maps navigation
+- Event details and descriptions
+- Mobile-optimized design
+
+
+🚀 FASTEST WAY TO DEPLOY (Recommended):
+----------------------------------------
+
+1. Extract the zip file:
+   
+   unzip nuit-blanche-app.tar.gz
+   OR
+   tar -xzf nuit-blanche-app.tar.gz
+
+
+2. Go to the folder:
+   
+   cd nuit-blanche-app
+
+
+3. Install dependencies:
+   
+   npm install
+
+
+4. Deploy to Vercel:
+   
+   npx vercel
+   
+   - Login with GitHub/Email when prompted
+   - Accept all defaults (just press Enter)
+   - Get your live URL in seconds!
+
+
+5. Open the URL on your phone and add to home screen!
+
+
+📱 ALTERNATIVE: Run Locally First
+----------------------------------
+
+   npm install
+   npm run dev
+   
+   Then open http://localhost:5173 on your phone
+
+
+🎯 TONIGHT AT NUIT BLANCHE:
+----------------------------
+
+1. Open your deployed URL on your phone
+2. Allow location access
+3. See all events sorted by distance from you
+4. Tap "Get Directions" to navigate to any event
+5. Tap "Details" to read about the artwork
+6. Enjoy the festival! 🌙✨
+
+
+💡 TIPS:
+--------
+
+- Add to home screen for app-like experience
+- Works offline once loaded
+- Battery saver: Use list view instead of maps
+- Best on Safari (iPhone) or Chrome (Android)
+
+
+📞 QUICK COMMANDS:
+------------------
+
+Deploy:           npx vercel
+Deploy (prod):    npx vercel --prod
+Test locally:     npm run dev
+Build:            npm run build
+
+
+🎨 EVENT HUBS:
+--------------
+
+✓ Downtown (Poetic Justice) - Queen West, Chinatown, Bentway
+✓ North York (Collective Composition) - Yonge St, Meridian Arts Centre
+✓ Etobicoke (From here, there, everywhere) - Humber area
+✓ Plus 60+ independent installations citywide
+
+
+READY TO DEPLOY? Just run:
+   
+   cd nuit-blanche-app
+   npm install
+   npx vercel
+
+
+Have an amazing Nuit Blanche! 🌙✨

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuit Blanche Navigator</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        #controls {
+            padding: 10px;
+            background: #2a2a2a;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        #view-toggle {
+            background: #764ba2;
+        }
+        
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #3a3a3a;
+            color: white;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        #map {
+            height: calc(100vh - 160px);
+            width: 100%;
+        }
+        
+        #list-view {
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+            padding: 10px;
+            background: #1a1a1a;
+            display: none;
+        }
+        
+        .event-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .event-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+        
+        .event-artist {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        
+        .event-distance {
+            font-size: 12px;
+            color: #764ba2;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .small-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            background: #3a3a3a;
+            border: 1px solid #667eea;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .small-btn:active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .leaflet-popup-content-wrapper {
+            background: #2a2a2a;
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .leaflet-popup-content {
+            margin: 12px;
+        }
+        
+        .popup-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .popup-artist {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        
+        .popup-distance {
+            font-size: 11px;
+            color: #764ba2;
+            margin-bottom: 8px;
+        }
+        
+        #status {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .user-marker {
+            background: #ff4444;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        
+        @media (max-width: 600px) {
+            #controls {
+                flex-direction: column;
+            }
+            
+            button, select {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>🎨 Nuit Blanche Navigator</h1>
+        <div class="subtitle">Oct 4-5, 2025 • 7pm-7am</div>
+    </div>
+    
+    <div id="controls">
+        <button id="locate-btn">📍 Find My Location</button>
+        <select id="sort-select">
+            <option value="distance">Sort by Distance</option>
+            <option value="name">Sort by Name</option>
+        </select>
+        <button id="view-toggle">📋 List View</button>
+    </div>
+    
+    <div id="map"></div>
+    <div id="list-view"></div>
+    <div id="status">Loading events...</div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Event data extracted from the Nuit Blanche website
+        const events = [
+            {name: "Theatre Passe Muraille - Nuit Blanche Rest Stop", artist: "Various", lat: 43.6534, lng: -79.4011},
+            {name: "What Brings You In - The Violins", artist: "Leslie Ting Productions", lat: 43.6528, lng: -79.3991},
+            {name: "It's Ok*, In Transit", artist: "Winta Hagos, Said Yassin", lat: 43.6525, lng: -79.3985},
+            {name: "the sound of lions in Chinatown (west gate)", artist: "Annie Wong, Hannia Cheng", lat: 43.6531, lng: -79.3978},
+            {name: "Letters to Your Ex", artist: "WhyWithCai", lat: 43.6540, lng: -79.3965},
+            {name: "MOVES", artist: "Tara Rose Morris", lat: 43.6520, lng: -79.3952},
+            {name: "The Poetry Dispensary", artist: "Marc Nair", lat: 43.6515, lng: -79.3945},
+            {name: "Tower of Babel", artist: "Shellie Zhang", lat: 43.6508, lng: -79.3938},
+            {name: "Pontianak.exe", artist: "Caroline McKenzie", lat: 43.6502, lng: -79.3932},
+            {name: "401 Richmond - Built For Art", artist: "Various Artists", lat: 43.6485, lng: -79.3918},
+            {name: "the sound of lions in Chinatown (east gate)", artist: "Annie Wong, Hannia Cheng", lat: 43.6535, lng: -79.3960},
+            {name: "Museum of Toronto - The 52: Stories of Women Who Transformed Toronto", artist: "Museum of Toronto, elonstudio", lat: 43.6498, lng: -79.3928},
+            {name: "Wildseed Centre for Art & Activism - The Meeting Point", artist: "Racquel Rowe, Ehiko Odeh, Ayat Salih", lat: 43.6475, lng: -79.3912},
+            {name: "People's Dancefloor", artist: "Lillian Allen, Sandra Brewster, Hannia Cheng, Mani Mazinani, Master T, Michie Mee, Alexis Nanibush-Pamajewong, Native Art Department International, Odario Williams, Tanisha Scott", lat: 43.6512, lng: -79.3935},
+            {name: "Dead Ringer", artist: "Dave Dyment", lat: 43.6505, lng: -79.3925},
+            {name: "The City", artist: "Jason van Horne", lat: 43.6495, lng: -79.3915},
+            {name: "we see you", artist: "Zahra Ebrahim, Keisha St. Louis-McBurnie, Eunice Wong, Aranya Khurana", lat: 43.6488, lng: -79.4025},
+            {name: "Home, Sweet Home", artist: "Anupa Khemadasa", lat: 43.6482, lng: -79.4018},
+            {name: "Where There Is No Room for Fiction", artist: "Tong Lam", lat: 43.6478, lng: -79.4012},
+            {name: "Sacred Tags", artist: "Quinn Hopkins, NOODIN STUDIO", lat: 43.6472, lng: -79.4005},
+            {name: "Crafting Connections: Didukh as a Cultural Conversation", artist: "Oksana Hawrylak, Marta Iwanek", lat: 43.6468, lng: -79.3998},
+            {name: "FOR THE YOUTH", artist: "Alexis Nanibush-Pamajewong", lat: 43.6462, lng: -79.3992},
+            {name: "Youngplace - Nuit Blanche at Youngplace", artist: "Various Artists", lat: 43.6458, lng: -79.3985},
+            {name: "Dark Landscapes", artist: "Moira Clark", lat: 43.6452, lng: -79.3978},
+            {name: "Koffler Arts - Intergalactic Planetary", artist: "Tracey Snelling", lat: 43.6522, lng: -79.3958},
+            {name: "Ryde: Wellbeing Challenge - Find Your Match", artist: "Experiential Activation", lat: 43.6518, lng: -79.3948},
+            {name: "Community Canvas", artist: "Experiential Activation", lat: 43.6512, lng: -79.3942},
+            {name: "Signals of the City: Crossing Paths", artist: "Afaf Naseem", lat: 43.6392, lng: -79.4028},
+            {name: "Ephemeral Presence", artist: "Jordan Shaw", lat: 43.6388, lng: -79.4022},
+            {name: "A Place I Call Home", artist: "Faisal Anwar", lat: 43.6382, lng: -79.4015},
+            {name: "The Eye of Wisdom", artist: "Ellen Pau", lat: 43.6528, lng: -79.3835},
+            {name: "Arts in Hong Kong", artist: "Experiential Activation", lat: 43.6522, lng: -79.3828},
+            {name: "The Bentway - Declaration of the Understory", artist: "Tania Willard", lat: 43.6395, lng: -79.4032},
+            {name: "The Bentway - la sombra que te cobija / the shadow that shelters you", artist: "Edra Soto", lat: 43.6398, lng: -79.4038},
+            {name: "PROTECT THE SACRED VOICE", artist: "Demian DinéYazhi'", lat: 43.6402, lng: -79.4045},
+            {name: "The Bentway - Seeing Celsius", artist: "LeuWebb Projects", lat: 43.6405, lng: -79.4052},
+            {name: "Take the Weather With You", artist: "Rhonda Weppler / Trevor Mahovsky", lat: 43.6408, lng: -79.4058},
+            {name: "One Day...", artist: "Rojin Shafiei", lat: 43.6412, lng: -79.4065},
+            {name: "Rejection - in the context of Sringaram", artist: "Neeraja Ramani, Robert Kingsbury, Rethuskaran Ramaneekaran, Priyanka Akhilan", lat: 43.6415, lng: -79.4072},
+            {name: "My words, Your words", artist: "Hye Eun Park", lat: 43.6418, lng: -79.4078},
+            {name: "Diatomic States", artist: "Dylan Alsop, Elle Morris, James Jordan", lat: 43.6515, lng: -79.3795},
+            {name: "Global Centre for Climate Action at OCAD University and the European Union Delegation to Canada - Dissolving Boundaries", artist: "OOOPStudio", lat: 43.6535, lng: -79.3885},
+            {name: "Disappearing Acts", artist: "Nina Jeffares-Levitt", lat: 43.6538, lng: -79.3892},
+            {name: "WISHING WELL: ALPHABET SOUP", artist: "xLq, Elizabeth Staples, Stella Conway", lat: 43.6542, lng: -79.3898},
+            {name: "The Bentway - A Lake Story", artist: "Melissa McGill", lat: 43.6422, lng: -79.4085},
+            {name: "Poetry in Fragmentation", artist: "Franziska Barczyk", lat: 43.6425, lng: -79.4092},
+            {name: "Knitting Echoes", artist: "Ailin Dong, Xinzhou Zhang", lat: 43.6428, lng: -79.4098},
+            {name: "પડછાયો (Paḍachāyō) – The Shadow Within", artist: "Kalpit Patel", lat: 43.6432, lng: -79.4105},
+            {name: "CNE – Withrow Common Gallery - Systems of Expression: From Pixels to Bottle Caps", artist: "Julia Shure, The Flying Bushman (Boloebi Charles Okah), plus various artists", lat: 43.6328, lng: -79.4168},
+            {name: "Secret Handshake", artist: "AWYAH, Shaughn Martel, Trevor Janega", lat: 43.6545, lng: -79.3598},
+            {name: "In Motion", artist: "Evangeline Y Brooks, Pegah Peivandi", lat: 43.6548, lng: -79.3605},
+            {name: "Daniels Spectrum - A Place We Call Home", artist: "Living Laneway Artists, Melissa Falconer, Komi Olaf, Benny Bing, Community Music Schools of Toronto, Morgan-Paige Melbourne, Madhu Kumar", lat: 43.6638, lng: -79.3592},
+            {name: "Wychwood Barns - Echoes and BAM! Nuit Blanche Arts Market", artist: "Lynn Jackson, Andrew Dickson", lat: 43.6812, lng: -79.4285},
+            {name: "Nuit Blanche East Danforth Hub - IN VIEW: Danforth Translated Storefront Series", artist: "Maria Patricia Abuel, Maddie Alexander, Khadija Aziz, Elaine Chan-Dow, Eva Connelly-Miller, Lynn Kain, Richael Laking, Izzy Paez, Alex Poutiainen, Ksenija Spasic, Roxane Tracey, Sabrina Tu, Victor SY Wei, Wolf⁷a:z.", lat: 43.6858, lng: -79.3125},
+            {name: "Adhar - Space (textile experience)", artist: "Saretta Khan", lat: 43.6862, lng: -79.3118},
+            {name: "Nuit Blanche East Danforth Hub - O'notsta'kéha (Shake the Bush)", artist: "DJ Kookum", lat: 43.6865, lng: -79.3112},
+            {name: "Nuit Blanche East Danforth Hub - Opening of the Mouth", artist: "Yasmeen Nematt Alla", lat: 43.6868, lng: -79.3105},
+            {name: "Japanese Canadian Cultural Centre - The Shape of Loss", artist: "Louise Noguchi", lat: 43.7245, lng: -79.3452},
+            {name: "Aga Khan Museum - Voices of the City", artist: "Poems In Passage, Raag Mala Music Society of Toronto, Dancemakers, Debopriya Chatterjee and Suchismita Chatterjee, Yahya Bihaki", lat: 43.7258, lng: -79.3328},
+            {name: "Aga Khan Museum - Circle of Sound: An Immersive Musical Journey", artist: "Justin Gray and collaborators", lat: 43.7262, lng: -79.3322},
+            {name: "Mabelle Arts - Signal", artist: "Chico Togni, Mercy Verdugo", lat: 43.6582, lng: -79.5425},
+            {name: "The Places We Carry", artist: "Alize Zorlutuna, Sound Design: Mani Mazinani", lat: 43.6545, lng: -79.3905},
+            {name: "5 Years at Home", artist: "Laurence Philomène", lat: 43.6548, lng: -79.3912},
+            {name: "My Name is 張麟發 Tommy Lan Phat Truong 2.0", artist: "Tommy Truong", lat: 43.6552, lng: -79.3918},
+            {name: "Place Setting", artist: "Stephanie Avery", lat: 43.6555, lng: -79.3925},
+            {name: "¿Habla Español? (Do you speak Spanish?)", artist: "Alina Ponce", lat: 43.6558, lng: -79.3932},
+            {name: "River Piece (Etobicoke)", artist: "asinnajaq", lat: 43.6285, lng: -79.5685},
+            {name: "Assembly Hall - Echoes of Identity", artist: "Daria Beer", lat: 43.6425, lng: -79.5328},
+            {name: "See Me From a Distance: Travesti Billboards", artist: "Sy Gomes, Roberta Kaya", lat: 43.7258, lng: -79.6085},
+            {name: "The Good Stuff", artist: "Crossroads Theatre", lat: 43.6565, lng: -79.3948},
+            {name: "Woven Words", artist: "Niloo Inalouei", lat: 43.6568, lng: -79.3955},
+            {name: "YesterHere", artist: "Liam Sawyers", lat: 43.6535, lng: -79.3825},
+            {name: "Domus Nexus", artist: "Humber Galleries Fellowship, Fabiana Camba, Maya Harry, Ravi Kant Ponnada, Yash Rana, Maryam Taghizadeh, Kelsey Wolff Power, Ashley Aalto, Casey Norris", lat: 43.7242, lng: -79.6098},
+            {name: "Flora, Luna-Corona (The Awakening Waves) 团花·月華 (潮生篇)", artist: "Eric Chengyang, Collaborators: Rana Khattab, Niloufar Salimi, Veronica Spiljak", lat: 43.6572, lng: -79.3962},
+            {name: "Lucid Flow", artist: "Ivan Rys", lat: 43.6575, lng: -79.3968},
+            {name: "Function", artist: "Noor Khan", lat: 43.6578, lng: -79.3975},
+            {name: "Undersight", artist: "Cassils, Lighting Artist: Christopher Kuhl", lat: 43.6582, lng: -79.3982},
+            {name: "The Loom of Lost Words", artist: "Maryam Zaraimajin", lat: 43.6585, lng: -79.3988},
+            {name: "Meridian Arts Centre - Nuit Blanche at the MAC!", artist: "Various Artists", lat: 43.7485, lng: -79.4152},
+            {name: "S'imbriquer", artist: "Philippe Dépelteau", lat: 43.6588, lng: -79.3995},
+            {name: "100% [City]", artist: "Rimini Protokoll", lat: 43.7488, lng: -79.4158},
+            {name: "DOUBLE TAKE", artist: "Nancy Tam with Daniel O'Shea/ A Wake of Vultures", lat: 43.6592, lng: -79.4002},
+            {name: "The World in a City - FIFA World Cup 26™ Toronto", artist: "Experiential Activation", lat: 43.6425, lng: -79.3818},
+            {name: "We Change Each Other", artist: "Shilpa Gupta", lat: 43.6485, lng: -79.3725},
+            {name: "The Nuit Blanche Remote Access Hub", artist: "Tangled Art + Disability and friends, Nuit Blanche Remote Access Hub live", lat: 43.7492, lng: -79.4165},
+            {name: "Future Perfect", artist: "Action Hero & Mia & Eric", lat: 43.6595, lng: -79.4008},
+            {name: "The Dream Weave", artist: "Blessyl Buan", lat: 43.6598, lng: -79.4015},
+            {name: "North York Arts - Northbound: Songs of Sovereignty", artist: "Muse & Museums, Apanaki Temitayo, Claudia Luz Doare, Ghislan Sutherland-Timm, Segun Caezar, Yinkore", lat: 43.7495, lng: -79.4172},
+            {name: "Lamination 1.0", artist: "Studio Rat", lat: 43.6602, lng: -79.4022},
+            {name: "\"Parade d'ouverture\" (Opening parade) - Mind the map(ping)", artist: "Stéphanie Léonard, Yen Linh Thai, Sheridan College", lat: 43.6605, lng: -79.4028},
+            {name: "Knot Knowings", artist: "We: The Diaspora, ChrisB Liu, Jessica Tseng, Joseph Wong", lat: 43.6608, lng: -79.4035}
+        ];
+
+        let map, userLocation = null;
+        let currentView = 'map';
+        let markers = [];
+        let userMarker = null;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([43.6532, -79.3832], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+            
+            addEventMarkers();
+            updateStatus('Tap "Find My Location" to see nearby events');
+        }
+
+        // Add markers for all events
+        function addEventMarkers() {
+            markers = events.map(event => {
+                const marker = L.marker([event.lat, event.lng], {
+                    icon: L.divIcon({
+                        className: 'event-marker',
+                        html: '🎨',
+                        iconSize: [30, 30]
+                    })
+                });
+                
+                marker.addTo(map);
+                marker.bindPopup(createPopupContent(event));
+                marker.eventData = event;
+                
+                return marker;
+            });
+        }
+
+        // Create popup content
+        function createPopupContent(event) {
+            const distance = userLocation ? calculateDistance(userLocation.lat, userLocation.lng, event.lat, event.lng) : null;
+            
+            return `
+                <div class="popup-title">${event.name}</div>
+                <div class="popup-artist">${event.artist}</div>
+                ${distance ? `<div class="popup-distance">📍 ${distance.toFixed(2)} km away</div>` : ''}
+                <div style="margin-top: 8px;">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}" 
+                       target="_blank" 
+                       class="small-btn">
+                        Get Directions →
+                    </a>
+                </div>
+            `;
+        }
+
+        // Calculate distance between two points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Get user location
+        function locateUser() {
+            updateStatus('Getting your location...');
+            
+            if (!navigator.geolocation) {
+                updateStatus('Geolocation not supported by your browser');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    // Remove old user marker if exists
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    
+                    // Add user location marker
+                    userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                        icon: L.divIcon({
+                            className: 'user-marker',
+                            html: '<div style="background: #ff4444; border: 3px solid white; border-radius: 50%; width: 20px; height: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></div>',
+                            iconSize: [20, 20]
+                        })
+                    }).addTo(map);
+                    
+                    userMarker.bindPopup('📍 You are here');
+                    
+                    // Center map on user
+                    map.setView([userLocation.lat, userLocation.lng], 14);
+                    
+                    // Update all markers with distance
+                    updateEventDistances();
+                    
+                    updateStatus(`Found ${events.length} events nearby`);
+                },
+                (error) => {
+                    updateStatus('Unable to get location. Please enable location services.');
+                    console.error(error);
+                }
+            );
+        }
+
+        // Update event distances
+        function updateEventDistances() {
+            events.forEach((event, index) => {
+                if (userLocation) {
+                    event.distance = calculateDistance(
+                        userLocation.lat, 
+                        userLocation.lng, 
+                        event.lat, 
+                        event.lng
+                    );
+                }
+            });
+            
+            // Update popups
+            markers.forEach(marker => {
+                marker.setPopupContent(createPopupContent(marker.eventData));
+            });
+            
+            // Re-render list if in list view
+            if (currentView === 'list') {
+                renderListView();
+            }
+        }
+
+        // Render list view
+        function renderListView() {
+            const listView = document.getElementById('list-view');
+            const sortBy = document.getElementById('sort-select').value;
+            
+            let sortedEvents = [...events];
+            
+            if (sortBy === 'distance' && userLocation) {
+                sortedEvents.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+            } else {
+                sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            
+            listView.innerHTML = sortedEvents.map(event => `
+                <div class="event-card">
+                    <div class="event-name">${event.name}</div>
+                    <div class="event-artist">👤 ${event.artist}</div>
+                    ${event.distance !== undefined ? 
+                        `<div class="event-distance">📍 ${event.distance.toFixed(2)} km away</div>` : 
+                        ''}
+                    <div class="event-actions">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}" 
+                           target="_blank" 
+                           class="small-btn">
+                            Get Directions
+                        </a>
+                        <button class="small-btn" onclick="showOnMap(${event.lat}, ${event.lng})">
+                            Show on Map
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show event on map
+        window.showOnMap = function(lat, lng) {
+            currentView = 'map';
+            document.getElementById('map').style.display = 'block';
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('view-toggle').textContent = '📋 List View';
+            
+            map.setView([lat, lng], 16);
+            
+            // Find and open popup for this marker
+            markers.forEach(marker => {
+                if (marker.eventData.lat === lat && marker.eventData.lng === lng) {
+                    marker.openPopup();
+                }
+            });
+        };
+
+        // Toggle view
+        function toggleView() {
+            if (currentView === 'map') {
+                currentView = 'list';
+                document.getElementById('map').style.display = 'none';
+                document.getElementById('list-view').style.display = 'block';
+                document.getElementById('view-toggle').textContent = '🗺️ Map View';
+                renderListView();
+            } else {
+                currentView = 'map';
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('list-view').style.display = 'none';
+                document.getElementById('view-toggle').textContent = '📋 List View';
+            }
+        }
+
+        // Update status message
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        // Event listeners
+        document.getElementById('locate-btn').addEventListener('click', locateUser);
+        document.getElementById('view-toggle').addEventListener('click', toggleView);
+        document.getElementById('sort-select').addEventListener('change', () => {
+            if (currentView === 'list') {
+                renderListView();
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+        });
+    </script>
+</body>
+</html>
